@@ -87,12 +87,24 @@ int SystemToUser(int virtAddr, int len, char* buffer) {
 }
 
 void increasePC() {
-    machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
-    machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
-    machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg) + 4);
+    // read register with the register's number is the value of the current program counter
+    int counter = machine->ReadRegister(PCReg);
+
+    // store value into the register with the register's number is the value of the previous program counter
+    machine->WriteRegister(PrevPCReg, counter);
+
+    // read register with the register's number is the value of the next program counter
+    counter = machine->ReadRegister(NextPCReg);
+
+    // store value into the register with the register's number is the value of the current program counter
+    machine->WriteRegister(PCReg, counter);
+
+    // read register with the register's number is the value of the second next program counter
+    counter += 4;
+
+    // store value into the register with the register's number is the value of the next program counter
+    machine->WriteRegister(NextPCReg, counter);
 }
-
-
 
 void syscallSC_PrintInt()
 {
@@ -171,14 +183,14 @@ void syscallSC_ReadChar()
 
     if(numBytes > 1) //Neu nhap nhieu hon 1 ky tu thi khong hop le
     {
-        printf("Chi duoc nhap duy nhat 1 ky tu!");
-        DEBUG('a', "\nERROR: Chi duoc nhap duy nhat 1 ky tu!");
+        printf(" Chi duoc nhap duy nhat 1 ky tu!\n");
+        DEBUG('a', " ERROR: Chi duoc nhap duy nhat 1 ky tu!\n");
         machine->WriteRegister(2, 0);
     }
     else if(numBytes == 0) //Ky tu rong
     {
-        printf("Ky tu rong!");
-        DEBUG('a', "\nERROR: Ky tu rong!");
+        printf(" Ky tu rong!\n");
+        DEBUG('a', " ERROR: Ky tu rong!\n");
         machine->WriteRegister(2, 0);
     }
     else
@@ -247,8 +259,8 @@ void syscallSC_ReadInt()
                 //Neu co ki tu khac so  0 thi la so thap phan
                 if(buf[ii] != '0')
                 {
-                    printf("\n\n Invalid integer number");
-                    DEBUG('a', "\n Invalid integer number");
+                    printf(" Invalid integer number\n");
+                    DEBUG('a', " Invalid integer number\n");
                     machine->WriteRegister(2, 0);
                     increasePC();
                     delete[] buf;
@@ -261,8 +273,8 @@ void syscallSC_ReadInt()
         //Neu gap ki tu khac so thi tra ve loi
         else if(buf[i] < '0' || buf[i] > '9')
         {
-            printf("\n\n Invalid integer number");
-            DEBUG('a', "\n Invalid integer number");
+            printf(" Invalid integer number\n");
+            DEBUG('a', " Invalid integer number\n");
             machine->WriteRegister(2, 0);
             increasePC();
             delete[] buf;
@@ -501,24 +513,24 @@ void syscallSC_ReadFloat()
 void syscallSC_CreateFile() {
     int virtAddr;
     char *fileName;
-    DEBUG('a', "\n SC_CreateFile being called ...");
-    DEBUG('a', "\n Reading virtual address of file name");
+    DEBUG('a', " SC_CreateFile being called ...\n");
+    DEBUG('a', " Reading virtual address of file name\n");
 
     virtAddr = machine->ReadRegister(4);
-    DEBUG('a', "\n Reading file name...");
+    DEBUG('a', " Reading file name...\n");
 
     fileName = UserToSystem(virtAddr, MaxFileLength + 1);
     // solve situations
     if (strlen(fileName) == 0) {
-        printf("\n File name is not valid");
-        DEBUG('a', "\n File name is not valid");
+        printf(" File name is not valid\n");
+        DEBUG('a', " File name is not valid\n");
         machine->WriteRegister(2, -1);
         increasePC();
         return;
     }
     else if (fileName == NULL) {
-        printf("\n Not enough memory in system");
-        DEBUG('a', "\n Not enough memory in system");
+        printf(" Not enough memory in system\n");
+        DEBUG('a', " Not enough memory in system\n");
         machine->WriteRegister(2, -1);
         delete fileName;
         increasePC();
@@ -528,7 +540,7 @@ void syscallSC_CreateFile() {
     DEBUG('a', "\n Finishing reading file name");
 
     if (!fileSystem->Create(fileName, 0)) {
-        printf("\n Error in creating file '%s'", fileName);
+        printf(" Error in creating file '%s'.\n", fileName);
         machine->WriteRegister(2, -1);
         delete fileName;
         increasePC();
@@ -596,7 +608,7 @@ void syscallSC_Read() {
 
     // Out of file table size
     if (id < 0 || id > fileTableSize - 1) {
-        printf("\n Error: Out of file table.");
+        printf(" Error: Out of file table.\n");
         machine->WriteRegister(2, -1);
         increasePC();
         return;
@@ -604,7 +616,7 @@ void syscallSC_Read() {
 
     // Check file exists
     if (fileSystem->openf[id] == NULL) {
-        printf("\n Error: File does not exists.");
+        printf(" Error: File does not exists.\n");
         machine->WriteRegister(2, -1);
         increasePC();
         return;
@@ -612,7 +624,7 @@ void syscallSC_Read() {
 
     // Not suitable for read file
     if (fileSystem->openf[id]->type == 3) {
-        printf("\n Error: File just for Writing.");
+        printf(" Error: File just for Writing.\n");
         machine->WriteRegister(2, -1);
         increasePC();
         return;
@@ -666,7 +678,7 @@ void syscallSC_Write() {
 
     // Out of file table size
     if (id < 0 || id > fileTableSize - 1) {
-        printf("\n Error: Out of file table.");
+        printf(" Error: Out of file table.\n");
         machine->WriteRegister(2, -1);
         increasePC();
         return;
@@ -674,7 +686,7 @@ void syscallSC_Write() {
 
     // Check file exists
     if (fileSystem->openf[id] == NULL) {
-        printf("\n Error: File does not exists.");
+        printf(" Error: File does not exists.\n");
         machine->WriteRegister(2, -1);
         increasePC();
         return;
@@ -682,7 +694,7 @@ void syscallSC_Write() {
 
     // Not suitable for read file
     if (fileSystem->openf[id]->type == 1 || fileSystem->openf[id]->type == 2) {
-        printf("\n Error: Cannot write file stdin or File just for reading.");
+        printf(" Error: Cannot write file stdin or File just for reading.\n");
         machine->WriteRegister(2, -1);
         increasePC();
         return;
@@ -745,7 +757,7 @@ void syscallSC_Seek() {
     // Kiem tra id cua file truyen vao co nam ngoai bang mo ta file khong
     if (id < 0 || id > fileTableSize - 1)
     {
-        printf("\nKhong the seek vi id nam ngoai bang mo ta file.");
+        printf(" Khong the seek vi id nam ngoai bang mo ta file.\n");
         machine->WriteRegister(2, -1);
         increasePC();
         return;
@@ -753,7 +765,7 @@ void syscallSC_Seek() {
     // Kiem tra file co ton tai khong
     if (fileSystem->openf[id] == NULL)
     {
-        printf("\nKhong the seek vi file nay khong ton tai.");
+        printf(" Khong the seek vi file nay khong ton tai.\n");
         machine->WriteRegister(2, -1);
         increasePC();
         return;
@@ -761,7 +773,7 @@ void syscallSC_Seek() {
     // Kiem tra co goi Seek tren console khong
     if (id == 0 || id == 1)
     {
-        printf("\nKhong the seek tren file console.");
+        printf(" Khong the seek tren file console.\n");
         machine->WriteRegister(2, -1);
         increasePC();
         return;
@@ -770,7 +782,7 @@ void syscallSC_Seek() {
     pos = (pos == -1) ? fileSystem->openf[id]->Length() : pos;
     if (pos > fileSystem->openf[id]->Length() || pos < 0) // Kiem tra lai vi tri pos co hop le khong
     {
-        printf("\nKhong the seek file den vi tri nay.");
+        printf(" Khong the seek file den vi tri nay.\n");
         machine->WriteRegister(2, -1);
     }
     else
@@ -783,8 +795,6 @@ void syscallSC_Seek() {
     return;
 }
 
-
-
 void ExceptionHandler(ExceptionType which) {
     int type = machine->ReadRegister(2);
     switch(which) {
@@ -793,7 +803,7 @@ void ExceptionHandler(ExceptionType which) {
         case SyscallException:
             switch(type) {
                 case SC_Halt:
-                    DEBUG('a', "Shutdown, initiated by user program.\n");
+		    printf(" Shutdown, initiated by user program.\n");
                     interrupt->Halt();
                     break;
                 case SC_PrintInt:
@@ -840,47 +850,46 @@ void ExceptionHandler(ExceptionType which) {
                     syscallSC_Close();
                     break;
                 default:
-                    //printf("Unexpected user mode exception %d %d\n", which, type);
-                    // ASSERT(FALSE);
                     increasePC();
                     break;
-                }
-                break;
+            }
+            break;
 
         case PageFaultException:
-            DEBUG('a', "PageFault is happening,\n");
+	    printf(" PageFaultException is happening,\n");
             interrupt->Halt();
             break;
 
         case ReadOnlyException:
-            DEBUG('a', "ReadOnly is happening,\n");
+	    printf(" ReadOnlyException is happening,\n");
             interrupt->Halt();
             break;
 
         case BusErrorException:
-            DEBUG('a', "BusError is happening,\n");
+            DEBUG('a', " BusError is happening,\n");
             interrupt->Halt();
             break;
 
         case AddressErrorException:
-            DEBUG('a', "AddressError is happening,\n");
+	    printf(" AddressErrorException is happening,\n");
             interrupt->Halt();
             break;
 
         case OverflowException:
-            DEBUG('a', "Overflow is happening,\n");
+	    printf(" OverflowException is happening,\n");
             interrupt->Halt();
             break;
 
         case IllegalInstrException:
-            DEBUG('a', "IllegalInstr is happening,\n");
+	    printf(" IllegalInstrException is happening,\n");
             interrupt->Halt();
             break;
 
         case NumExceptionTypes:
-            DEBUG('a', "NumExceptionTypes is happening,\n");
+	    printf(" NumExceptionTypes is happening,\n");
             interrupt->Halt();
             break;
+
         default:
             interrupt->Halt();
     }
