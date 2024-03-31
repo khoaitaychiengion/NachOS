@@ -8,25 +8,23 @@ int main()
 	char c;
 	char *filename = "mota.txt";
 	
-	openFileId = Open(filename, 1); // Goi ham Open de mo file 
+	openFileId = Open(filename, 1);
 	
-	if (openFileId != -1) //Kiem tra Open co loi khong
+	if (openFileId != -1)
 	{
-		//Seek den cuoi file de lay duoc do dai noi dung (fileSize)
 		fileSize = Seek(-1, openFileId);
 		i = 0;
-		// Seek den dau tap tin de tien hanh Read
 		Seek(0, openFileId);
 		
-		for (; i < fileSize; i++) // Cho vong lap chay tu 0 - fileSize
+		for (; i < fileSize; i++)
 		{
-			Read(&c, 1, openFileId); // Goi ham Read de doc tung ki tu noi dung file
-			PrintChar(c); // Goi ham PrintChar de in tung ki tu ra man hinh
+			Read(&c, 1, openFileId); 
+			PrintChar(c); 
 		}
-		Close(openFileId); // Goi ham Close de dong file
+		Close(openFileId);
 	}
 	else
 	{
-		PrintString(" -> Mo file khong thanh cong!!\n\n");
+		PrintString(" --- Mo file that bai!!\n\n");
 	}
 }
