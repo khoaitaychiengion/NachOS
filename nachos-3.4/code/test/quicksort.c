@@ -88,5 +88,6 @@ int main()
 		if (i != n - 1)
 			Write(space, 2, idFile);
 	}
+	Close(idFile);
 }
 	
