@@ -795,6 +795,43 @@ void syscallSC_Seek() {
     return;
 }
 
+
+void syscallSC_Exec() {
+    // Input: Dia chi cua ten chuong trinh
+    // Output: -1: Loi, ProcessID: Thanh cong
+    // Cong dung: Thuc thi chuong trinh voi ten chuong trinh truyen vao
+    int virtAddr = machine->ReadRegister(4); // Lay dia chi cua ten chuong trinh
+    char *progName;
+    progName = UserToSystem(virtAddr, MaxFileLength);
+    // Kiem tra xem co du bo nho de chua ten chuong trinh khong
+    if (progName == NULL)
+    {
+        printf(" Khong du bo nho de chua ten chuong trinh.\n");
+        machine->WriteRegister(2, -1);
+        increasePC();
+        return;
+    }
+    // Kiem tra xem co ton tai chuong trinh nay khong
+    OpenFile *prog = fileSystem->Open(progName);
+    if (prog == NULL)
+    {
+        printf(" Khong the mo file %s de thuc thi.\n", progName);
+        machine->WriteRegister(2, -1);
+        increasePC();
+        return;
+    }
+    delete prog;
+
+    // Return child process id
+    int id = pTab->ExecUpdate(progName); 
+    machine->WriteRegister(2,id);
+
+    delete[] progName;	
+    IncreasePC();
+    return;
+    
+}
+
 void ExceptionHandler(ExceptionType which) {
     int type = machine->ReadRegister(2);
     switch(which) {

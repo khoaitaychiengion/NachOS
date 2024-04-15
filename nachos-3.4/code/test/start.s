@@ -204,6 +204,14 @@ ReadFloat:
 	.end ReadFloat
 
 
+	.globl Exec
+	.ent	Exec
+Exec:
+	addiu $2,$0,SC_Exec
+	syscall
+	j	$31
+	.end Exec
+
 /* dummy function to keep gcc happy */
         .globl  __main
         .ent    __main

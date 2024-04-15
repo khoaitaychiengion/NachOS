@@ -38,6 +38,7 @@
 #define SC_PrintString	    16
 #define SC_ReadFloat	    129
 #define SC_PrintFloat	    18
+#define SC_Exec              19
 
 
 #ifndef IN_ASM
@@ -135,7 +136,7 @@ void Close(OpenFileId id);
 
 int Seek(int pos, OpenFileId id);
 
-
+SpaceId Exec(char *name);
 
 /* User-level thread operations: Fork and Yield.  To allow multiple
  * threads to run within a user program. 
