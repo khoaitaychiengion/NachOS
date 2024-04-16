@@ -38,7 +38,6 @@
 #define SC_PrintString	    16
 #define SC_ReadFloat	    129
 #define SC_PrintFloat	    18
-#define SC_Exec              19
 
 
 #ifndef IN_ASM

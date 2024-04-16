@@ -827,9 +827,35 @@ void syscallSC_Exec() {
     machine->WriteRegister(2,id);
 
     delete[] progName;	
-    IncreasePC();
+    increasePC();
     return;
     
+}
+
+void syscallSC_Join() {
+    // read id of the process that need to join from register 4.
+    int id = machine->ReadRegister(4);
+    int result = pTab->JoinUpdate(id);
+    
+    // store the result into register 2
+    machine->WriteRegister(2, result);
+    increasePC();
+    return;
+}
+
+void syscallSC_Exit() {
+    // read the exit status from register 4.
+    int exitStatus = machine->ReadRegister(4);
+    if (exitStatus != 0) {
+        increasePC();
+        return;
+    }
+
+    // store the result into register 2
+    int result = pTab->ExitUpdate(exitStatus);
+    machine->WriteRegister(2, result);
+    increasePC();
+    return;
 }
 
 void ExceptionHandler(ExceptionType which) {
@@ -886,6 +912,12 @@ void ExceptionHandler(ExceptionType which) {
                 case SC_Close:
                     syscallSC_Close();
                     break;
+		        case SC_Join:
+		            syscallSC_Join();
+		            break;
+		        case SC_Exit:
+		            syscallSC_Exit();
+		            break;
                 default:
                     increasePC();
                     break;
