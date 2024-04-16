@@ -894,6 +894,73 @@ void syscallSC_CreateSemaphore() {
     return;
 }
 
+void syscallSC_Up()
+{
+    int virtAddr = machine->ReadRegister(4);
+
+    char* name = UserToSystem(virtAddr, MaxFileLength + 1);
+    if (name == NULL)
+    {
+        DEBUG('a', "\n Not enough memory in System");
+        printf("\n Not enough memory in System");
+        machine->WriteRegister(2, -1);
+        delete[] name;
+        increasePC();
+        return;
+    }
+
+    int res = semTab->Signal(name);
+
+    if (res == -1)
+    {
+        DEBUG('a', "\n This semaphore name does not exist!");
+        printf("\n This semaphore name does not exist!");
+        machine->WriteRegister(2, -1);
+        delete[] name;
+        increasePC();
+        return;
+    }
+
+    delete[] name;
+    machine->WriteRegister(2, res);
+    increasePC();
+    return;
+
+}
+
+void syscallSC_Down()
+{
+    int virtAddr = machine->ReadRegister(4);
+
+    char* name = UserToSystem(virtAddr, MaxFileLength + 1);
+    if (name == NULL)
+    {
+        DEBUG('a', "\n Not enough memory in System");
+        printf("\n Not enough memory in System");
+        machine->WriteRegister(2, -1);
+        delete[] name;
+        increasePC();
+        return;
+    }
+
+    int res = semTab->Wait(name);
+
+    if (res == -1)
+    {
+        DEBUG('a', "\n This semaphore name does not exist!");
+        printf("\n This semaphore name does not exist!");
+        machine->WriteRegister(2, -1);
+        delete[] name;
+        increasePC();
+        return;
+    }
+
+    delete[] name;
+    machine->WriteRegister(2, res);
+    increasePC();
+    return;
+}
+
 void ExceptionHandler(ExceptionType which) {
     int type = machine->ReadRegister(2);
     switch(which) {
@@ -956,6 +1023,12 @@ void ExceptionHandler(ExceptionType which) {
 		            break;
                 case SC_CreateSemaphore:
                     syscallSC_CreateSemaphore();
+                    break;
+                case SC_Up:
+                    syscallSC_Up();
+                    break;
+                case SC_Down:
+                    syscallSC_Down();
                     break;
                 default:
                     increasePC();

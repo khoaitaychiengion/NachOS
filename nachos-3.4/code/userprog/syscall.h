@@ -39,7 +39,8 @@
 #define SC_ReadFloat	    129
 #define SC_PrintFloat	    18
 #define SC_CreateSemaphore  19
-
+#define SC_Up				20
+#define SC_Down				21
 
 #ifndef IN_ASM
 
@@ -153,6 +154,10 @@ void Fork(void (*func)());
 void Yield();		
 
 int CreateSemaphore(char* name, int semval);
+
+int Up(char* name);
+
+int Down(char* name);
 
 #endif /* IN_ASM */
 
