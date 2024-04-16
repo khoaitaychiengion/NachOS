@@ -858,6 +858,42 @@ void syscallSC_Exit() {
     return;
 }
 
+void syscallSC_CreateSemaphore() {
+
+    int virtAddr = machine->ReadRegister(4);
+    int semval = machine->ReadRegister(5);
+
+    char *name = UserToSystem(virtAddr, MaxFileLength + 1);
+
+    if (name == NULL)
+    {
+        DEBUG('a', "\n Not enough memory in System");
+        printf("\n Not enough memory in System");
+        machine->WriteRegister(2, -1);
+        delete[] name;
+        increasePC();
+        return;
+    }
+
+    int newSem = semTab->Create(name, semval);
+
+    if (newSem == -1)
+    {
+        DEBUG('a', "\n Can not create Semaphore");
+        printf("\n Can not create Semaphore");
+        machine->WriteRegister(2, -1);
+        delete[] name;
+        increasePC();
+        return;
+    }
+
+    // Create Semaphore success !!!
+    delete[] name;
+    machine->WriteRegister(2, newSem);
+    increasePC();
+    return;
+}
+
 void ExceptionHandler(ExceptionType which) {
     int type = machine->ReadRegister(2);
     switch(which) {
@@ -918,6 +954,9 @@ void ExceptionHandler(ExceptionType which) {
 		        case SC_Exit:
 		            syscallSC_Exit();
 		            break;
+                case SC_CreateSemaphore:
+                    syscallSC_CreateSemaphore();
+                    break;
                 default:
                     increasePC();
                     break;
