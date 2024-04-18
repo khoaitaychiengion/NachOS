@@ -1015,6 +1015,9 @@ void ExceptionHandler(ExceptionType which) {
                 case SC_Close:
                     syscallSC_Close();
                     break;
+                case SC_Exec:
+                    syscallSC_Exec();
+                    break;
 		        case SC_Join:
 		            syscallSC_Join();
 		            break;
