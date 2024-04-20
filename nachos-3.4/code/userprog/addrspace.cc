@@ -69,7 +69,7 @@ AddrSpace::AddrSpace(OpenFile *executable)
     {
 	printf("Unable to open file %s\n");
 	    return;
-    )
+    }
 	    
     executable->ReadAt((char *)&noffH, sizeof(noffH), 0);
     if ((noffH.noffMagic != NOFFMAGIC) && 
