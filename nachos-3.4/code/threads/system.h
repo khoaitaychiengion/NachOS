@@ -17,7 +17,6 @@
 #include "timer.h"
 #include "bitmap.h"
 #include "ptable.h"
-#include "pcb.h"
 #include "stable.h"
 
 // Initialization and cleanup routines
