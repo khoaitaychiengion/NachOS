@@ -58,14 +58,6 @@ Exit:
 	j	$31
 	.end Exit
 
-	.globl Exec
-	.ent	Exec
-Exec:
-	addiu $2,$0,SC_Exec
-	syscall
-	j	$31
-	.end Exec
-
 	.globl Join
 	.ent	Join
 Join:
