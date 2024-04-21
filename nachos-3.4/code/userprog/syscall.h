@@ -137,7 +137,6 @@ void Close(OpenFileId id);
 
 int Seek(int pos, OpenFileId id);
 
-SpaceId Exec(char *name);
 
 /* User-level thread operations: Fork and Yield.  To allow multiple
  * threads to run within a user program. 

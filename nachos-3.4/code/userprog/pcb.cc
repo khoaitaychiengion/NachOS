@@ -91,19 +91,21 @@ void PCB::ExitRelease()
 {
 	exitsem->V();
 }
+void PCB::SetFileName(char* fn){ strcpy(Fname,fn);}
 
 //------------------------------------------------------------------
 int PCB::Exec(char *filename, int pID)
 {
 	mutex->P();
-	thread= new Thread(filename);
-	if(thread == NULL)
+	this->thread= new Thread(filename);
+	if(this->thread == NULL)
 	{
 		printf("\nLoi: Khong tao duoc tien trinh moi !!!\n");
 		mutex->V();
 		return -1;
 	}
-	thread->processID= pID;
+	this->thread->processID= pID;
+	this->parentID = currentThread->processID;
 	thread->Fork(MyStartProcess,pID);
 	mutex->V();
 	return pID;

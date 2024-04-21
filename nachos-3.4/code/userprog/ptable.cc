@@ -52,8 +52,8 @@ int PTable::ExecUpdate(char* filename)
 ////////////////////////////////////////////////////////////
 
 //Kiem tra con slot trong khong
-	int ID= GetFreeSlot();
-	if(ID==-1)
+	int ID= this->GetFreeSlot();
+	if(ID < 0)
 	{
 		printf("\nLoi: Da vuot qua 10 tien trinh !!!\n");
 		bmsem->V();
@@ -62,7 +62,8 @@ int PTable::ExecUpdate(char* filename)
 ////////////////////////////////////////////////////////////
 
 	pcb[ID]= new PCB(ID);
-	bm->Mark(ID);
+	pcb[ID]->SetFileName(filename);
+	pcb[ID]->parentID = currentThread->processID;
 	int pID= pcb[ID]->Exec(filename,ID);
 
 	bmsem->V();
